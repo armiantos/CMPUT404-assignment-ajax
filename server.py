@@ -97,7 +97,8 @@ def get_entity(entity):
 @app.route("/clear", methods=['POST','GET'])
 def clear():
     '''Clear the world out!'''
-    return None
+    myWorld.clear()
+    return ''
 
 if __name__ == "__main__":
     # TODO: Revert this back to defaults

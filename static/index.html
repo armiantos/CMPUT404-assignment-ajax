@@ -86,6 +86,7 @@
             }
 
             function drawPokemon(pokemon) {
+                // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/drawImage
                 context.drawImage(pokemonImages[pokemon.imageIndex], pokemon.x, pokemon.y, pokemon.width, pokemon.height);
             }
 
@@ -248,7 +249,8 @@
             // Add the application specific mouse listeners!
             //XXX: TODO Make these prettier!
             mouse.mousedowners.push(function (x, y, clicked, e) {
-                currentPokemon.imageIndex = counter % 4;
+                const index = Math.floor(Math.random() * 4);
+                currentPokemon.imageIndex = index;
                 currentPokemon.x = x;
                 currentPokemon.y = y;
                 currentPokemon.width = 0;

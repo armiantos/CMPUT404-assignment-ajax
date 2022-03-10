@@ -77,30 +77,6 @@
             world = {};
 
             //XXX: TODO Make this prettier!
-            function drawCircle(context, entity) {
-                with (context) {
-                    beginPath();
-                    lineWidth = 3;
-                    var x = entity['x'];
-                    var y = entity['y'];
-                    //moveTo(x,y);
-                    fillStyle = entity['colour'];
-                    strokeStyle = fillStyle;
-                    arc(x, y, entity['radius'] ? entity['radius'] : 50, 0, 2.0 * Math.PI, false);
-                    stroke();
-                }
-            }
-
-            function prepEntity(entity) {
-                if (!entity['colour']) {
-                    entity['colour'] = '#FF0000';
-                }
-                if (!entity['radius']) {
-                    entity['radius'] = 50;
-                }
-                return entity;
-            }
-
             function clearFrame() {
                 with (context) {
                     moveTo(0, 0);

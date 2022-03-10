@@ -10,9 +10,17 @@
         on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
         "/>
         <script src=" json2.js"></script>
+        <style>
+            body {
+                background-color: #fff;
+            }
+        </style>
     </head>
 
-    <body bgcolor="black" height="100%" width="100%">
+    <body height="100%" width="100%">
+        <section id="instructions">
+            <p>Click and drag to draw a pokemon</p>
+        </section>
         <canvas id="c" width="100%" height="100%" style="-webkit-tap-highlight-color: transparent"></canvas>
         <script>
             var canvas = document.getElementById('c');
@@ -20,6 +28,19 @@
             var context = canvas.getContext('2d');
             var W = (canvas.width = window.innerWidth - 6);
             var H = (canvas.height = window.innerHeight - 50);
+
+            const pokemonToImageSourceMap = {
+                bulbasaur: '/static/Spr_1b_001.webp',
+                charmander: '/static/Spr_1b_004.webp',
+                squirtle: '/static/Spr_1b_007.webp',
+                pikachu: '/static/Spr_1b_025.webp',
+            };
+            let pokemonImages = [];
+            for (let pokemon in pokemonToImageSourceMap) {
+                const pokemonImage = new Image();
+                pokemonImage.src = pokemonToImageSourceMap[pokemon];
+                pokemonImages.push(pokemonImage);
+            }
 
             function sendJSONXMLHTTPRequest(url, objects, callback) {
                 var xhr = new XMLHttpRequest();
@@ -46,6 +67,13 @@
                 xhr.send(JSON.stringify(objects));
             }
 
+            let currentPokemon = {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+                imageIndex: 0,
+            };
             world = {};
 
             //XXX: TODO Make this prettier!
@@ -76,9 +104,13 @@
             function clearFrame() {
                 with (context) {
                     moveTo(0, 0);
-                    fillStyle = '#000';
+                    fillStyle = '#fff';
                     fillRect(0, 0, W, H);
                 }
+            }
+
+            function drawPokemon(pokemon) {
+                context.drawImage(pokemonImages[pokemon.imageIndex], pokemon.x, pokemon.y, pokemon.width, pokemon.height);
             }
 
             // This actually draws the frame
@@ -86,8 +118,9 @@
                 clearFrame();
                 for (var key in world) {
                     var entity = world[key];
-                    drawCircle(context, prepEntity(entity));
+                    drawPokemon(entity);
                 }
+                drawPokemon(currentPokemon);
             }
 
             var drawNext = true;
@@ -239,28 +272,23 @@
             // Add the application specific mouse listeners!
             //XXX: TODO Make these prettier!
             mouse.mousedowners.push(function (x, y, clicked, e) {
-                addEntityWithoutName({
-                    x: x,
-                    y: y,
-                    colour: 'blue',
-                });
+                currentPokemon.imageIndex = counter % 4;
+                currentPokemon.x = x;
+                currentPokemon.y = y;
+                currentPokemon.width = 0;
+                currentPokemon.height = 0;
             });
 
             mouse.mouseuppers.push(function (x, y, clicked, e) {
-                addEntityWithoutName({
-                    x: x,
-                    y: y,
-                    colour: 'red',
-                });
+                addEntityWithoutName(currentPokemon);
             });
 
             mouse.mousedraggers.push(function (x, y, clicked, e) {
-                addEntityWithoutName({
-                    x: x,
-                    y: y,
-                    colour: 'green',
-                    radius: 10,
-                });
+                const width = x - currentPokemon.x;
+                const height = y - currentPokemon.y;
+                const size = Math.max(width, height);
+                currentPokemon.width = size;
+                currentPokemon.height = size;
             });
 
             function update() {
@@ -270,8 +298,10 @@
                     world = jsonData;
                     drawNextFrame();
                     drawFrame();
+                    // Mimic a global counter
+                    counter = Object.keys(world).length;
                 }
-                var worldRequest = new XMLHttpRequest();
+                const worldRequest = new XMLHttpRequest();
                 worldRequest.open('GET', '/world');
                 worldRequest.addEventListener('load', onWorldUpdate);
                 worldRequest.send();

@@ -13,3 +13,5 @@ Contributors / Licensing
 Generally everything is LICENSE'D under the Apache 2 license by Abram Hindle.
 
 
+Generation 1 pokemon sprites taken from [bulbapedia](https://archives.bulbagarden.net/wiki/Category:Red_and_Blue_sprites)
+
